@@ -1,65 +1,44 @@
-import {createContext, useContext, useState, memo ,useCallback} from 'react';
+import { Component, createContext } from "react";
 
-const Context = createContext();
+const Context = createContext("mi valor");
 
-const ContadorProvider = ({children}) => {
-    const [contador,setCont] =useState(0)
-
-    const incrementar = useCallback(() => setCont( x => x + 1 ) , [])
-    const decrementar = useCallback(() => setCont( x => x - 1 ) , [])
-
+const Provider = ({children}) =>{
     return(
-        <Context.Provider value={{contador,incrementar,decrementar}}>
-            {children}       
+        <Context.Provider value="otro valor">
+            {children}
         </Context.Provider>
     )
-
 }
 
-const Incrementar =  memo(() =>{
-    console.log('incrementar')
-    const { incrementar } = useContext(Context)
-    return(
-        <button onClick={incrementar}> Incrementar</button>
-    )
-})
 
-const Decrementar = memo(() =>{
-    console.log('decrementar')
-    const { decrementar } = useContext(Context)
-    return(
-        <button onClick={decrementar}> Decrementar</button>
-    )
-})
-
-const  Label = () =>{
-    console.log("Label");
-    const {contador} = useContext(Context)
-    return(
-        <h1>{contador}</h1>
-    )
+class Componente extends Component{
+    //obtener contexto dentro de una clase forma 1 contextType es obligatorio en caso de no querer vamos al caso 3 
+    // static contextType = Context 
+    render(){
+        console.log(this.context)
+        return(
+            <div>
+                Hola Mundo
+            </div>
+        )
+    }
 }
+
+//obtener contexto en un componente de clase 
+//mediante una propieadad estatica 
+//tambien context type es obligatorio 
+// Componente.contextType = Context 
 
 const App = () =>{
     return(
-        <ContadorProvider>
-            <Label/>
-            <Incrementar/>
-            <Decrementar/>
-        </ContadorProvider>
+        <Provider>
+            <Componente/>
+            {/* en caso de no querer utilizar los metodos estaticos debo hacerlo mediante consumer de context contextType */}
+            <Context.Consumer>
+                {valor => <div>{valor}</div>}
+            </Context.Consumer>
+        </Provider>
     )
 }
 
 export default App
-
-
-//El problema principal de Context es el rendimiento. Cuando se actualiza el render del componente padre se actualizan los hijos 
-// vamos a usar memo para evitar el render innecesario de componentes. Al usar memo no hay cambios, por que no funciona. Trataremos al a funcion de 
-
-// const incrementar = () => setCont(contador + 1 )
-// const decrementar = () => setCont(contador - 1 )
-
-// memoizarlas con useCallback
-//pero siguen renderizando. AL crear un provider el value que se crea   <Context.Provider value={{contador,incrementar,decrementar}}> se re-renderiza 
-//cada vez que haya un cambio en el DOM se hara un re-render
-
