@@ -1,51 +1,53 @@
-import {createContext,useContext,useState} from 'react'
+import {createContext, useContext, useState} from 'react';
 
+const Context = createContext();
 
-const Context = createContext({valor:false, toggle: () =>{ console.log("test ")}})
+const ContadorProvider = ({children}) => {
+    const [contador,setCont] =useState(0)
 
-const Provider = ({children}) =>{
-    const[valor,setValor] = useState(false)
-    const value = {
-        valor, 
-        toggle: ()=> setValor(!valor)
-    }
+    const incrementar = () => setCont(contador + 1 )
+    const decrementar = () => setCont(contador - 1 )
+
     return(
-        <Context.Provider value={value}>
-            {children}
+        <Context.Provider value={{contador,incrementar,decrementar}}>
+            {children}       
         </Context.Provider>
     )
+
 }
 
-const Componente = () =>{
-    //para poder acceder al contexto tengo que acceder a useContext con el objeto que le va a dar el contecto de las propiedades 
-    const { valor , toggle} = useContext(Context)
+const Incrementar = () =>{
+    console.log('incrementar')
+    const { incrementar } = useContext(Context)
     return(
-        <div>
-            <label>{valor.toString()}</label>
-            <button onClick={toggle}>Toggle</button>
-        </div>
-    )
-}
-const Componente2 = () =>{
-    //para poder acceder al contexto tengo que acceder a useContext con el objeto que le va a dar el contecto de las propiedades 
-    const { valor , toggle} = useContext(Context)
-    return(
-        <div>
-            <label>{valor.toString()}</label>
-            <button onClick={toggle}>Toggle</button>
-        </div>
+        <button onClick={incrementar}> Incrementar</button>
     )
 }
 
-const App  = () =>{
+const Decrementar = () =>{
+    console.log('decrementar')
+    const { decrementar } = useContext(Context)
     return(
-        <div>
-        <Provider>
-            <Componente/>
-        </Provider>
-        <Componente2/>
-        </div>
+        <button onClick={decrementar}> Decrementar</button>
+    )
+}
+const  Label = () =>{
+    console.log("Label");
+    const {contador} = useContext(Context)
+    return(
+        <h1>{contador}</h1>
+    )
+}
+
+const App = () =>{
+    return(
+        <ContadorProvider>
+            <Label/>
+            <Incrementar/>
+            <Decrementar/>
+        </ContadorProvider>
     )
 }
 
 export default App
+
